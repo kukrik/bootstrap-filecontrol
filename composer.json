@@ -1,0 +1,16 @@
+{
+    "name": "kukrik/bootstrap-filecontrol",
+    "description": "QCubed v4 plugin of FileControl",
+    "type": "qcubed-library",
+    "keywords": ["qcubed", "bootstrap-filecontrol"],
+    "license": "MIT",
+    "require": {
+        "php": ">=7.4"
+    },
+    "autoload": {
+      "psr-4": {"QCubed\\Plugin\\": "src/"}
+    },
+    "extra": {
+        "examples": ["filecontrol.php"]
+    }
+}

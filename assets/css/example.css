@@ -1,0 +1,10 @@
+.btn-orange {
+    color: #fff;
+    background-color: #f36118;
+    border-color: #e44c14;
+}
+.btn-orange:hover, .btn-orange:focus, .btn-orange.active {
+    color: #fff;
+    background-color: #e44c14;
+    border-color: #e44c14;
+}
