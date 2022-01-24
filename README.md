@@ -12,7 +12,7 @@ https://blueimp.github.io/jQuery-File-Upload.
 
 You can find different settings in filecontrol.php.
 
-![Image of kukrik](screenshot/bcfilecontrol_screenshot.jpg?raw=true)
+![Image of kukrik](screenshot/bsfilecontrol_screenshot.jpg?raw=true)
 
 If you have not previously installed QCubed Bootstrap and twitter bootstrap, run the following actions on the command line of your main installation directory by Composer:
 ```
