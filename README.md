@@ -1,7 +1,7 @@
 # QCubed BsFileControl
 
 
-## BsFileControl for QCubed v4
+## BsFileControl for QCubed-4
 
 QCubed-4's standard FileControl upload class has been redesigned for the Bootstrap wrapper.
 
@@ -21,7 +21,7 @@ If you have not previously installed QCubed Bootstrap and twitter bootstrap, run
 and
 
 ```
-    composer require kukrik/bootstrap
+    composer require qcubed-4/plugin-bootstrap
     composer require kukrik/bootstrap-filecontrol
 ```
 

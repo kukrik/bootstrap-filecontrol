@@ -9,9 +9,9 @@
 
 namespace QCubed\Plugin;
 
-use QCubed\Bootstrap as Bs;
 use QCubed\Exception\InvalidCast;
 use QCubed\Project\Control\ControlBase;
+use QCubed\Project\Control\FormBase;
 use QCubed\Exception\Caller;
 use QCubed\Type;
 use QCubed as Q;
@@ -33,21 +33,31 @@ use QCubed as Q;
  */
 class BsFileControl extends Q\Control\BlockControl
 {
-    protected $strTagName = "input";
+    protected string $strTagName = "input";
 
-    protected $strGlyph;
-    protected $blnMultiple;
-    protected $blnFolder;
+    protected ?string $strGlyph = null;
+    protected ?bool $blnMultiple = null;
+    protected ?bool $blnFolder = null;
+    protected string $strCssClass = "btn btn-default fileinput-button";
 
-    protected $strFileName = null;
-    protected $strType = null;
-    protected $intSize = null;
-    protected $strFile = null;
+    protected ?string $strFileName = null;
+    protected ?string $strType = null;
+    protected ?int $intSize = null;
+    protected ?string $strFile = null;
 
     // SETTINGS
-    protected $strFormAttributes = array('enctype' => 'multipart/form-data');
+    protected array $strFormAttributes = array('enctype' => 'multipart/form-data');
 
-    public function __construct($objParentObject, $strControlId = null)
+    /**
+     * Initializes a new instance of the class, setting the parent object and optional control ID.
+     * Registers required files during construction.
+     *
+     * @param ControlBase|FormBase $objParentObject The parent object, either a control or form.
+     * @param string|null $strControlId An optional control ID for the instance.
+     *
+     * @throws Caller
+     */
+    public function __construct(ControlBase|FormBase $objParentObject, ?string $strControlId = null)
     {
         try {
             parent::__construct($objParentObject, $strControlId);
@@ -58,7 +68,13 @@ class BsFileControl extends Q\Control\BlockControl
         $this->registerFiles();
     }
 
-    protected function registerFiles()
+    /**
+     * Registers and includes the required CSS files for the component.
+     *
+     * @return void
+     * @throws Caller
+     */
+    protected function registerFiles(): void
     {
         $this->AddCssFile(QCUBED_BOOTSTRAP_CSS); // make sure they know
         $this->AddCssFile(QCUBED_FONT_AWESOME_CSS); // make sure they know
@@ -71,11 +87,13 @@ class BsFileControl extends Q\Control\BlockControl
     }
 
     /**
+     * Parses the POST data to update the control's value based on the uploaded file details.
+     *
      * @return void
      * @throws Caller
-     * @throws Q\Exception\InvalidCast
+     * @throws InvalidCast
      */
-    public function parsePostData()
+    public function parsePostData(): void
     {
         // Check to see if this Control's Value was passed in via the POST data
         if ((array_key_exists($this->strControlId, $_FILES)) && ($_FILES[$this->strControlId]['tmp_name'])) {
@@ -88,11 +106,11 @@ class BsFileControl extends Q\Control\BlockControl
     }
 
     /**
-     * Returns the HTML of the control which can be sent to user's browser
+     * Returns the HTML of the control which can be sent to the user's browser
      *
      * @return string HTML of the control
      */
-    protected function getControlHtml()
+    protected function getControlHtml(): string
     {
         // Reset Internal Values
         $this->strFileName = null;
@@ -107,9 +125,7 @@ class BsFileControl extends Q\Control\BlockControl
 
         $strToReturn = $this->renderInput($this->strTagName, $attributes, $this->blnMultiple, $this->blnFolder);
         $strToReturn .= Q\Html::renderTag('span', null, $this->getInnerHtml());
-        $strToReturn = $this->renderTag('span', ['class' =>$this->strCssClass], null, $strToReturn);
-
-        return $strToReturn;
+        return $this->renderTag('span', ['class' =>$this->strCssClass], null, $strToReturn);
     }
 
     /**
@@ -117,7 +133,7 @@ class BsFileControl extends Q\Control\BlockControl
      *
      * @return bool
      */
-    public function validate()
+    public function validate(): bool
     {
         if ($this->blnRequired) {
             if (strlen($this->strFileName) > 0) {
@@ -132,13 +148,16 @@ class BsFileControl extends Q\Control\BlockControl
     }
 
     /**
-     * @param $strTag
-     * @param $mixAttributes
-     * @param $blnMultiple
-     * @param $blnFolder
-     * @return string|void
+     * Renders an HTML input tag with provided attributes and optional properties for multiple and folder input handling.
+     *
+     * @param string $strTag The HTML tag to render.
+     * @param array|string $mixAttributes The attributes to add to the HTML tag. Can be a string or an associative array.
+     * @param bool $blnMultiple Optional. Indicates if the input allows multiple selections. Defaults to false.
+     * @param bool $blnFolder Optional. Indicates if the input involves folder selection. Defaults to false.
+     *
+     * @return string The rendered HTML string of the input tag.
      */
-    public function renderInput($strTag, $mixAttributes, $blnMultiple = false, $blnFolder = false)
+    public function renderInput(string $strTag, array|string $mixAttributes, ?bool $blnMultiple = false, ?bool $blnFolder = false): string
     {
         assert(!empty($strTag));
         $strToReturn = '<' . $strTag;
@@ -146,7 +165,7 @@ class BsFileControl extends Q\Control\BlockControl
             if (is_string($mixAttributes)) {
                 $strToReturn .= ' ' . trim($mixAttributes);
             } else {
-                // assume array
+                // assume an array
                 $strToReturn .= self::renderHtmlAttributes($mixAttributes);
             }
             if ($blnMultiple) {
@@ -162,12 +181,17 @@ class BsFileControl extends Q\Control\BlockControl
             $strToReturn .= ' />';
             return $strToReturn;
         }
+        return $strToReturn;
     }
 
+
     /**
-     * @return string
+     * Retrieves the inner HTML content of the element, including an icon represented
+     * by a glyph if specified.
+     *
+     * @return string The inner HTML content, optionally prefixed with a glyph icon.
      */
-    protected function getInnerHtml()
+    protected function getInnerHtml(): string
     {
         $strToReturn = parent::getInnerHtml();
         if ($this->strGlyph) {
@@ -177,11 +201,18 @@ class BsFileControl extends Q\Control\BlockControl
     }
 
     /**
-     * @param $strName
-     * @return bool|int|mixed
-     * @throws Caller
+     * Magic method to retrieve the value of a property.
+     *
+     * This method allows access to internal properties by their names.
+     * If the requested property is not defined, it delegates to the parent
+     * implementation or throws an exception.
+     *
+     * @param string $strName The name of the property to retrieve.
+     *
+     * @return mixed The value of the requested property.
+     * @throws Caller If the property is not defined or accessible.
      */
-    public function __get($strName)
+    public function __get(string $strName): mixed
     {
         switch ($strName) {
             case "Glyph": return $this->strGlyph;
@@ -204,13 +235,19 @@ class BsFileControl extends Q\Control\BlockControl
     }
 
     /**
-     * @param $strName
-     * @param $mixValue
+     * Dynamically sets the value of a property based on the given name.
+     * Specific property names are handled internally, casting the value
+     * to the appropriate type. If the property name is unrecognized,
+     * attempts to call the parent class's __set method.
+     *
+     * @param string $strName The name of the property to set.
+     * @param mixed $mixValue The value to assign to the property.
+     *
      * @return void
      * @throws Caller
-     * @throws InvalidCast
+     * @throws InvalidCast If the property name is not recognized and the parent __set method throws the exception.
      */
-    public function __set($strName, $mixValue)
+    public function __set(string $strName, mixed $mixValue): void
     {
         switch ($strName) {
             case "Glyph":
